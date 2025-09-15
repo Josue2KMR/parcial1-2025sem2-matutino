@@ -27,4 +27,24 @@ async function renderUsers() {
     }
 }
 
+async function addUser() {
+    const name = document.querySelector('input[name="name"]').value.trim();
+    const email = document.querySelector('input[name="email"]').value.trim();
+    const role = document.querySelector('select[name="role"]').value;
+    if (!name || !email) {
+        alert('Name and email are required');
+        return;
+    }
+    try {
+        await fetch(`${API_BASE}/users`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, role })
+        });
+        renderUsers();
+    } catch (error) {
+        alert('Error adding user');
+    }
+}
+
 renderUsers();
