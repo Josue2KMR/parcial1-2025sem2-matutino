@@ -1,12 +1,9 @@
-const API_BASE = 'http://localhost:3000';
-
-
 async function renderUsers() {
     try {
         const resUsers = await fetch(`http://localhost:3000/users`);
         users = await resUsers.json();
 
-        const usersContainer = document.getElementById('users-container');
+        const usersContainer = document.getElementById('users');
         usersContainer.innerHTML = '';
 
         users.forEach(user => {
