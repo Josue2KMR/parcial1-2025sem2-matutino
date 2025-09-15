@@ -13,7 +13,7 @@
  */
 
 // Importamos los datos desde el archivo JSON usando ES6 import
-import bibliotecaData from './datos_biblioteca.json' assert { type: 'json' };
+import bibliotecaData from './datos_biblioteca.json' with { type: 'json' };
 
 // Creamos una copia de los datos para trabajar con ellos
 const biblioteca = { ...bibliotecaData };
@@ -35,6 +35,30 @@ const biblioteca = { ...bibliotecaData };
  */
 function prestarLibro(idLibro, idEstudiante, fechaPrestamo) {
   // Tu código aquí
+  const libro = biblioteca.libros.find(l => l.id === idLibro);
+
+  if(!libro.disponible){
+    return "Error: El libro '" + libro.titulo + "' no está disponible";
+  }
+
+  const estudiante = biblioteca.estudiantes.find(e => e.id === idEstudiante);
+
+  const fechaRegex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!fechaRegex.test(fechaPrestamo)) {
+    return "Error: El formato de fecha debe ser YYYY-MM-DD";
+  }
+  
+  libro.disponible = false;
+  
+  libro.prestamos.push({
+    estudiante: estudiante.nombre,
+    fechaPrestamo: fechaPrestamo,
+    fechaDevolucion: null
+  });
+
+  estudiante.librosActuales.push(idLibro);
+  
+  return true;
 }
 
 
@@ -50,18 +74,60 @@ function prestarLibro(idLibro, idEstudiante, fechaPrestamo) {
 function buscarLibros(criterios) {
   // Tu código aquí
   // Ejemplo de criterios: {titulo: "javascript", disponible: true}
+  return biblioteca.libros.filter(libro =>
+  {
+    if (!criterios || Object.keys(criterios).length === 0) {
+      return true;
+    }
+
+     for (const [clave, valor] of Object.entries(criterios)) {
+      switch (clave) {
+        case 'titulo':
+          if (!libro.titulo.toLowerCase().includes(valor.toLowerCase())) {
+            return false;
+          }
+          break;
+          
+        case 'autor':
+          if (!libro.autor.toLowerCase().includes(valor.toLowerCase())) {
+            return false;
+          }
+          break;
+          
+        case 'categoria':
+          if (libro.categoria.toLowerCase() !== valor.toLowerCase()) {
+            return false;
+          }
+          break;
+          
+        case 'disponible':
+          if (libro.disponible !== valor) {
+            return false;
+          }
+          break;
+          
+        case 'añoPublicacion':
+          if (libro.añoPublicacion !== valor) {
+            return false;
+          }
+          break;
+          
+        default:
+          break;
+      }
+    }
+    
+    return true;
+  });
 }
 
 
 // ALGUNOS CASOS DE PRUEBA
 // Descomentar para probar tu implementación
 
-/*
+
 console.log("Probando préstamo de libro:");
 console.log(prestarLibro(1, 3, "2025-09-13"));
 
 console.log("\nBuscando libros de programación disponibles:");
 console.log(buscarLibros({categoria: "Programación", disponible: true}));
-
-*/
-
